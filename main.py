@@ -19,5 +19,4 @@ if __name__ == "__main__":
     logging.disable(logging.WARNING) 
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-    # run(str(sys.argv[1]))
-    run("/Users/niueva/dev/python/ai-face-recognition-photo-grouping/real_dataset")
+    run(str(sys.argv[1]))
