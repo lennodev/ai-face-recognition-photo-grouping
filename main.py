@@ -13,13 +13,14 @@ detectService = Service.detectService()
 def run(mode, args):
     print(f"Received mode: {mode}")
     if(mode == "Register"):
+        print("Not yet available")
         # commonService.register(args)
-    if(mode == "Train"):
+    elif(mode == "Train"):
         dsPath = "train_dataset"
         trainService.run(dsPath)
     elif(mode == "Group"):
         dsPath = "detect_dataset"
-        args = dsPath #TODO: to be removed, for testing
+        args = dsPath  # TODO: to be removed, for testing
         detectService.run(args)
     else:
         print("Fail to run, mode incorrect!")
@@ -32,4 +33,4 @@ if __name__ == "__main__":
     logging.disable(logging.WARNING)
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-    run(str(sys.argv[1]),str(sys.argv[2]))
+    run(str(sys.argv[1]), str(sys.argv[2]))

@@ -1,5 +1,4 @@
 from dependency_injector import providers, containers
-from service.AiService import AiService
 from service.TrainService import TrainService
 from service.DetectService import DetectService
 from service.FaceExtractService import FaceExtractService
@@ -19,8 +18,6 @@ class Common(containers.DeclarativeContainer):
 
 
 class Service(containers.DeclarativeContainer):
-
-    aiService = providers.Singleton(AiService, modelLoader=Model.modelLoader)
 
     trainService = providers.Singleton(
         TrainService, modelLoader=Model.modelLoader, faceExtractService=Common.feService)
