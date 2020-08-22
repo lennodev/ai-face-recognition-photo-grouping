@@ -54,14 +54,27 @@ AI Face-recognition Photo Grouping project aims to group(find and copy) multiple
 
 ### Folder Structure
 ``` bash
-├─jupyter_notebook
-│  └─output
-├─model
-│  └─trained
-├─service
-├─train_dataset		
-├─output
-└─util
+├── User										#folder to store user training photos
+├── jupyter_notebook
+│   ├── face-recognition-photo-grouping.ipynb	#jupyter notebook for better understanding
+│   └── facenet_keras.h5						#FaceNet model hiroki taniai
+├── model
+│   ├── ModelLoader.py							#Model helper class
+│   ├── embedding
+│   │   └── embedding.npz						#generated training config
+│   └── facenet_keras_hiroki_taniai.h5			#FaceNet model
+├── service
+│   ├── CommonService.py					
+│   ├── DetectService.py
+│   ├── FaceExtractService.py
+│   ├── TrainService.py
+├── util
+│   ├── ConfigLoader.py
+│   └── Logger.py
+├── loader.py
+├── main.py
+├── output
+└── requirements.txt
 ```
 
 ## Installation
