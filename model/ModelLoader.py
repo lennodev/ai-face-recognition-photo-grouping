@@ -10,26 +10,25 @@ from sklearn.preprocessing import LabelEncoder, Normalizer
 
 
 class ModelLoader:
-    def __init__(self):
-        print(
-            "* \n Loading Keras model...\n please wait until server has fully started "
-        )
+    def __init__(self, configLoader, logger):
+        self.logger = logger
+        self.configLoader = configLoader
+
+        self.logger.logInfo("Loading Keras model...")
         self.loadFaceNetModel()
-        print(
-            "* \n Model loaded. Start processing\n "
-        )
 
     # load train model
     def loadFaceNetModel(self):
         # create model for embedding
         self.faceNetModel = load_model(
             "./model/facenet_keras_hiroki_taniai.h5")
-
     # fit face net model with trained data and labels(int)
 
     def fitFaceNetModelFromFile(self):
         # load trained data
-        self.trainedData = load("./model/trained/face_embeddings.npz")
+        embedPath = self.configLoader.getConfig("path", "embeddingPath")
+        embedName = self.configLoader.getConfig("path", "embeddingConfigName")
+        self.trainedData = load(embedPath + "/"+embedName)
         embedFaceList = self.trainedData["arr_0"]
         nameList = self.trainedData["arr_1"]
 

@@ -133,3 +133,6 @@ dmypy.json
 *.jpg
 *.jpeg
 *.gif
+
+# Backup
+*.bak

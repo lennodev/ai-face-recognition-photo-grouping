@@ -10,34 +10,42 @@ from sklearn.preprocessing import LabelEncoder, Normalizer
 
 
 class DetectService:
-    def __init__(self, modelLoader, faceExtractService):
+    def __init__(self, modelLoader, faceExtractService, logger, configLoader):
+        self.configLoader = configLoader
         self.modelLoader = modelLoader
+        self.logger = logger
         self.faceExtractService = faceExtractService
         self.predictThreshold = 80
-        self.outputPath = "./output"
+        self.outputPath = self.configLoader.getConfig("path", "outputPath")
         self.normalizer = Normalizer(norm='l2')  # L2 = least squares
 
     def run(self, path):
-        print(f"<Read folder images>: {path}")
+        self.logger.logInfo(
+            f"Start grouping process now. Please wait.....")
+        self.logger.logDebug(f"<Read folder images>: {path}")
 
         # clean up output folder
         shutil.rmtree(self.outputPath, ignore_errors=True)
 
         # read faces and names mappings
         fileNameFaceMap = self.faceExtractService.getEmbedFileNameFaceMap(path)
-        # print(f">loaded fileNameFaceMap: {len(fileNameFaceMap)}")
+        self.logger.logDebug(
+            f">loaded fileNameFaceMap: {len(fileNameFaceMap)}")
 
         # prepare model for prediction
         self.modelLoader.fitFaceNetModelFromFile()
 
         # predict face
-        # print(f">Check is match with file name")
+        # self.logger.logDebug(f">Check is match with file name")
         # self.guessIsMatchWithFileName(fileNameFaceMap)
 
-        # print(f">Guess who is in the picture")
+        self.logger.logDebug(f">Guess who is in the picture")
         self.guessWhoInFile(path, fileNameFaceMap)
 
-        print("----------End------------\n")
+        self.logger.logDebug("----------End------------\n")
+
+        self.logger.logInfo(
+            f"Photo grouping completed. View photo in /output folder")
 
     def guessIsMatchWithFileName(self, fileNameFaceMap):
         labelEncoder = self.modelLoader.labelEncoder
@@ -84,26 +92,28 @@ class DetectService:
                         resultStr = "WRONG!!!!!!!!"
                         invalidCnt = invalidCnt+1
 
-                print(
+                self.logger.logDebug(
                     f"Result: {resultStr}, Actual Person: {fileName}, Predict Person: {personName}, Proba: {str('{0:.2f}'.format(predictClassProb)) }%")
-                # print("predictClass: %s" % predictClassInt)
-                # print("predictProb: %s" % predictClassProbArr)
-                # print("predictProb[0, predictClassIdx]: %s" % predictClassProb)
-                # print("predictClassName: %s" % predictClassName)
+                self.logger.logDebug("predictClass: %s" % predictClassInt)
+                self.logger.logDebug("predictProb: %s" % predictClassProbArr)
+                self.logger.logDebug(
+                    "predictProb[0, predictClassIdx]: %s" % predictClassProb)
+                self.logger.logDebug("predictClassName: %s" % predictClassName)
 
-            print(
+            self.logger.logDebug(
                 f"correctCnt: {correctCnt}, invalidCnt: {invalidCnt}, unknownCnt:{unknownCnt}")
-            print("----------------------\n")
+            self.logger.logDebug("----------------------\n")
 
     def guessWhoInFile(self, path, fileNameFaceMap):
         # loop each file
         for key in fileNameFaceMap:
             fileName = key
-            print(
+            self.logger.logDebug(
                 f"------------------- Processing file {fileName} -------------------")
 
             embedFaceList = fileNameFaceMap[key]
-            print(f'embedFaceList shape:{np.asarray(embedFaceList).shape}')
+            self.logger.logDebug(
+                f'embedFaceList shape:{np.asarray(embedFaceList).shape}')
 
             # normalize list
             embedFaceList = self.normalizer.transform(embedFaceList)
@@ -118,8 +128,8 @@ class DetectService:
                     currFace)
                 predictClassProbArr = self.modelLoader.faceNetModel.predict_proba(
                     currFace)
-                # print(
-                #     f"Direct result: predictClassArr: {predictClassArr}, predictClassProbArr: {predictClassProbArr}")
+                self.logger.logDebug(
+                    f"Direct result: predictClassArr: {predictClassArr}, predictClassProbArr: {predictClassProbArr}")
 
                 # prepare result for display
                 predictClassInt = predictClassArr[0]
@@ -129,8 +139,8 @@ class DetectService:
                 predictClassName = self.modelLoader.labelEncoder.inverse_transform(
                     predictClassArr)
 
-                # print(
-                #     f"predictClassInt: {predictClassInt}, predictClassName: {predictClassName}, predictClassProb: {predictClassProb}")
+                self.logger.logDebug(
+                    f"predictClassInt: {predictClassInt}, predictClassName: {predictClassName}, predictClassProb: {predictClassProb}")
 
                 if(predictClassProb < self.predictThreshold):
                     personName = "classify as Unknown - " + \
@@ -141,7 +151,7 @@ class DetectService:
                     personName = predictClassName[0]
                     targetFolder = personName
 
-                print(
+                self.logger.logDebug(
                     f"Guess: {personName} @ {str('{0:.2f}'.format(predictClassProb))}")
 
                 # prepare for copy to target folder
@@ -155,5 +165,5 @@ class DetectService:
                 os.makedirs(targetPath, exist_ok=True)
                 shutil.copy(srcPath, targetPath)
 
-            print(
-                f"\nFile {fileName} copied to {len(folderList)} folder: {' | '.join(map(str, folderList))}\n")
+            self.logger.logDebug(
+                f"File {fileName} copied to {len(folderList)} folder: {' | '.join(map(str, folderList))}\n")

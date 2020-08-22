@@ -28,7 +28,7 @@ class FaceExtractService:
             fullPath = path + "/" + folderName + "/"
 
             if os.path.isdir(fullPath):
-                self.logger.logInfo(f'Scanning Folder: {fullPath}')
+                self.logger.logDebug(f'Scanning Folder: {fullPath}')
                 tmpMap = self.getEmbedFileNameFaceMap(
                     fullPath)  # fileName and face as map
 
@@ -38,13 +38,13 @@ class FaceExtractService:
                         faceList.append(embedFace)
                         nameList.append(folderName)
 
-                self.logger.logInfo(
-                    f">Person: ({folderName}), No of image loaded: {len(tmpMap.keys())}, No of faces extracted: {len(faceList)} \n")
+                self.logger.logDebug(
+                    f"Person: ({folderName}), No of image loaded: {len(tmpMap.keys())}, No of faces extracted: {len(faceList)}")
             else:
-                self.logger.logInfo(f'>Skip - Not a folder: {fullPath}\n')
+                self.logger.logDebug(f'Skip - Not a folder: {fullPath}')
                 continue
 
-        self.logger.logInfo(f">Total faces loaded: {len(faceList)} \n")
+        self.logger.logDebug(f"Total faces loaded: {len(faceList)} ")
 
         return faceList, nameList
 
